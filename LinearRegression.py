@@ -5,20 +5,26 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
 def main():
+    #Read CSV File
     dataset= pd.read_csv("02-2019.csv", sep=';')
+    #Preprocessing, deleting unnecessary columns
     dropped_columns= ['id','tipo_elem','ocupacion','carga','vmed','error','periodo_integracion']
     dataset = dataset.drop(columns=dropped_columns)
+    #Normalize the rest of the dataset, also we remain with dates between 6 and 8 am
     dataset['fecha'] = dataset['fecha'].apply(normalizeTime)
     dataset = dataset[dataset['fecha'] != -1]
     intensidad = dataset['intensidad']
     max_intensidad = intensidad.max()
     min_intensidad = intensidad.min()
     dataset['intensidad'] = np.clip((intensidad - min_intensidad) / max_intensidad, 0, 1)
+    #just print to check everything fine
     print(dataset.head())
+    #training
     x= dataset[['fecha']]
     y= dataset['intensidad']
     x_train, x_test, y_train, y_test= train_test_split(x, y,test_size=0.2, random_state=12)
     lr=LinearRegression().fit(x_train,y_train)
+    #testing
     y_pred=lr.predict(x_test)
     sqr_error= mean_squared_error(y_test, y_pred)
     r2= r2_score(y_test, y_pred)
