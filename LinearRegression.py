@@ -36,9 +36,9 @@ def main():
 
 def normalizeTime (str: str):
     """
-    Metodo para normalizar la columna fecha asignando 0 a las 6AM y 1 a las 8 AM
-    :param str: la cadena con la fecha
-    :return: dicha fecha ya normalizada para el training
+    This method normalizes the date
+    :param str: the string of the date
+    :return: the normalized date (float)
     """
     array = str.split(":")
     fecha_hora = array[0].split(" ")
@@ -50,7 +50,7 @@ def normalizeTime (str: str):
         return np.clip(((hora + (minuto / 60)) - 6) / 2, 0, 1)
 def getCSVs():
     """
-    Metodo para obtener todos los CSVs
+    Method that gets all CSVs
     :return:
     """
     with open('208627-0-transporte-ptomedida-historico.rdf', 'r') as file_urls:
