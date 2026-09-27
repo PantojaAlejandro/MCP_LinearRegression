@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import numpy as np
+import re
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
@@ -8,6 +9,8 @@ def main():
     #Read CSV File
     dataset= pd.read_csv("02-2019.csv", sep=';')
     #Preprocessing, deleting unnecessary columns
+    dataset = dataset[dataset['error'] == 'N']
+    dataset = dataset[dataset['tipo_elem'] == 'M30']
     dropped_columns= ['id','tipo_elem','ocupacion','carga','vmed','error','periodo_integracion']
     dataset = dataset.drop(columns=dropped_columns)
     #Normalize the rest of the dataset, also we remain with dates between 6 and 8 am
@@ -32,6 +35,11 @@ def main():
     print("El r cuadrado es: ", r2)
 
 def normalizeTime (str: str):
+    """
+    Metodo para normalizar la columna fecha asignando 0 a las 6AM y 1 a las 8 AM
+    :param str: la cadena con la fecha
+    :return: dicha fecha ya normalizada para el training
+    """
     array = str.split(":")
     fecha_hora = array[0].split(" ")
     hora = int(fecha_hora[1])
@@ -40,6 +48,18 @@ def normalizeTime (str: str):
         return -1
     else:
         return np.clip(((hora + (minuto / 60)) - 6) / 2, 0, 1)
+def getCSVs():
+    """
+    Metodo para obtener todos los CSVs
+    :return:
+    """
+    with open('208627-0-transporte-ptomedida-historico.rdf', 'r') as file_urls:
+        lines = file_urls.readlines()
+        urls = [re.search('https://datos(.+?).zip', l).group(0) for l in lines if ".zip" in l]
+        urls_wget = ["wget -nc " + x for x in urls]
+        with open("download_script.sh", "w") as outputfile:
+            outputfile.write("\n".join(urls_wget))
+
 
 if __name__ == "__main__":
     main()
