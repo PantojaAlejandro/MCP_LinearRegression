@@ -13,14 +13,14 @@ def main():
     dataset = dataset[dataset['tipo_elem'] == 'M30']
     dropped_columns= ['id','tipo_elem','ocupacion','carga','vmed','error','periodo_integracion']
     dataset = dataset.drop(columns=dropped_columns)
-    #Normalize the rest of the dataset, also we remain with dates between 6 and 8 am
+    #Normalize the rest of the dataset, we only remain with dates between 6 and 8 am
     dataset['fecha'] = dataset['fecha'].apply(normalizeTime)
     dataset = dataset[dataset['fecha'] != -1]
     intensidad = dataset['intensidad']
     max_intensidad = intensidad.max()
     min_intensidad = intensidad.min()
     dataset['intensidad'] = np.clip((intensidad - min_intensidad) / max_intensidad, 0, 1)
-    #just print to check everything fine
+    #just print to check everything is fine
     print(dataset.head())
     #training
     x= dataset[['fecha']]
